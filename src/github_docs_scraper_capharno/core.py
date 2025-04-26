@@ -4,10 +4,20 @@ Core functionality for GitHub Documentation Scraper.
 
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, TypedDict
 from urllib.parse import urlparse
 
 import requests
+
+
+class GitHubFile(TypedDict):
+    name: str
+    path: str
+    download_url: str
+    size: int
+    type: str
+    html_url: str
+    content: Optional[str]
 
 
 def parse_github_url(url: str) -> Tuple[str, str, str]:
@@ -73,7 +83,7 @@ def should_exclude_file(filename: str, exclude_patterns: List[str]) -> bool:
 
 def get_docs_files(
     owner: str, repo: str, path: str, exclude: List[str], token: Optional[str] = None
-) -> List[dict]:
+) -> List[GitHubFile]:
     """Get list of markdown files from GitHub repository."""
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
     headers = get_github_headers(token)
@@ -99,7 +109,7 @@ def get_file_content(file_url: str, token: Optional[str] = None) -> str:
 
 
 def save_files(
-    files: List[dict], output_path: Path, token: Optional[str] = None
+    files: List[GitHubFile], output_path: Path, token: Optional[str] = None
 ) -> None:
     """Save multiple files to the specified directory."""
     for file in files:
@@ -111,7 +121,7 @@ def save_files(
 
 
 def combine_files(
-    files: List[dict], output_file: Path, token: Optional[str] = None
+    files: List[GitHubFile], output_file: Path, token: Optional[str] = None
 ) -> None:
     """Combine multiple files into a single output file."""
     with open(output_file, "w", encoding="utf-8") as outfile:
