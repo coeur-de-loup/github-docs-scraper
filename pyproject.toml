@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "github_docs_scraper_capharno"
-version = "0.1.1"
+version = "0.1.2"
 description = "CLI tool to scrape Markdown documentation from GitHub repositories"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -39,7 +39,7 @@ scrape-docs = "github_docs_scraper_capharno.cli:main"
 packages = ["src/github_docs_scraper_capharno"]
 
 [tool.bumpversion]
-current_version = "0.1.1" # Set your current version here
+current_version = "0.1.2" # Set your current version here
 commit = true
 tag = true
 tag_name = "v{new_version}" # Matches your workflow trigger pattern
@@ -92,7 +92,7 @@ pythonpath = ["src"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.1.1"
+version = "0.1.2"
 tag_format = "v$version"
 bump_message = "bump: version $current_version → $new_version"
 version_files = [
