@@ -1,0 +1,55 @@
+name: Publish Python Package
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to create the release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for all branches and tags
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: gh release create $TAG_NAME --generate-notes
+
+  publish-to-testpypi:
+    needs: create-release # Run after the release is created
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      id-token: write # Required for trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python, uv, and dependencies
+        uses: ./.github/actions/setup
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish package to TestPyPI
+        env:
+          # This secret will now be sourced from the 'staging' environment
+          # Remove the commented-out lines if not needed
+          # Use tokenless publishing (preferred) if configured in TestPyPI
+          # Or uncomment the line below and set the TEST_PYPI_API_TOKEN secret
+          # TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          UV_PUBLISH_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }} # uv publish uses UV_PUBLISH_PASSWORD env var
+        run: >
+          uv publish --publish-url https://test.pypi.org/legacy/
+          --username __token__
+          --password $UV_PUBLISH_PASSWORD
