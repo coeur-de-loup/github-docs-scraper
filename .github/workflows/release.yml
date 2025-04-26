@@ -26,10 +26,10 @@ jobs:
           TAG_NAME: ${{ github.ref_name }}
         run: gh release create $TAG_NAME --generate-notes
 
-  publish-to-testpypi:
+  publish-to-pypi:
     needs: create-release # Run after the release is created
     runs-on: ubuntu-latest
-    environment: staging
+    environment: prod
     permissions:
       id-token: write # Required for trusted publishing
     steps:
@@ -41,15 +41,5 @@ jobs:
       - name: Build package
         run: uv build
 
-      - name: Publish package to TestPyPI
-        env:
-          # This secret will now be sourced from the 'staging' environment
-          # Remove the commented-out lines if not needed
-          # Use tokenless publishing (preferred) if configured in TestPyPI
-          # Or uncomment the line below and set the TEST_PYPI_API_TOKEN secret
-          # TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          UV_PUBLISH_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }} # uv publish uses UV_PUBLISH_PASSWORD env var
-        run: >
-          uv publish --publish-url https://test.pypi.org/legacy/
-          --username __token__
-          --password $UV_PUBLISH_PASSWORD
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
