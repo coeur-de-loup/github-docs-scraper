@@ -54,7 +54,7 @@ scrape-docs https://github.com/owner/repo/docs -j -o combined.md
 scrape-docs --version
 
 ```shell
-GitHub Docs Scraper, version 0.1.3
+GitHub Docs Scraper, version 0.1.4
 ```
 
 ### Options
